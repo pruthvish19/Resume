@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shreyarth University - Attendance System</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #002147;
+      color: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 60px;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      width: 90%;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #002147;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 10px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #002147;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #013366;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #aaa;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #002147;
+      color: white;
+    }
+
+    .footer {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .footer div {
+      width: 40%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Generic_University_Logo.svg/120px-Generic_University_Logo.svg.png" alt="University Logo">
+    <h1>Shreyarth University, Ahmedabad</h1>
+  </header>
+
+  <div class="container">
+    <h2>Student Attendance System</h2>
+
+    <!-- School and Department Selection -->
+    <label for="school">Select School:</label>
+    <select id="school" onchange="loadDepartments()">
+      <option value="">-- Select School --</option>
+      <option value="cs">School of Computer Science & Application</option>
+      <option value="management">School of Management</option>
+      <option value="nursing">School of Nursing</option>
+    </select>
+
+    <label for="department">Select Department:</label>
+    <select id="department" onchange="showAttendance()">
+      <option value="">-- Select Department --</option>
+    </select>
+
+    <!-- Attendance Table -->
+    <div id="attendanceSection" style="display:none;">
+      <h3 id="attendanceTitle"></h3>
+      <table>
+        <tr>
+          <th>Roll No.</th>
+          <th>Student Name</th>
+          <th>Present</th>
+          <th>Absent</th>
+        </tr>
+        <tbody id="studentList"></tbody>
+      </table>
+      <button onclick="submitAttendance()">Submit Attendance</button>
+    </div>
+
+    <!-- Signatures -->
+    <div class="footer">
+      <div>
+        <p>_________________________</p>
+        <p>Faculty Signature</p>
+      </div>
+      <div>
+        <p>_________________________</p>
+        <p>HOD Signature</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Departments grouped by schools
+    const schools = {
+      cs: ["BCA", "MCA", "MSc IT", "iMSc IT", "Cyber Security", "Animation"],
+      management: ["BBA", "BCOM", "iMBA", "MBA"],
+      nursing: ["BSc Nursing", "GNM", "Post Basic BSc Nursing"]
+    };
+
+    // Dummy student names per department
+    const students = {
+      BCA: ["BCA Student 1", "BCA Student 2", "BCA Student 3"],
+      MCA: ["MCA Student 1", "MCA Student 2", "MCA Student 3"],
+      "MSc IT": ["MSc IT Student 1", "MSc IT Student 2"],
+      "iMSc IT": ["iMSc Student 1", "iMSc Student 2"],
+      "Cyber Security": ["Cyber Student 1", "Cyber Student 2"],
+      Animation: ["Animation Student 1", "Animation Student 2"],
+      BBA: ["BBA Student 1", "BBA Student 2"],
+      BCOM: ["BCOM Student 1", "BCOM Student 2"],
+      iMBA: ["iMBA Student 1", "iMBA Student 2"],
+      MBA: ["MBA Student 1", "MBA Student 2"],
+      "BSc Nursing": ["Nursing Student 1", "Nursing Student 2"],
+      GNM: ["GNM Student 1", "GNM Student 2"],
+      "Post Basic BSc Nursing": ["PB BSc Student 1", "PB BSc Student 2"]
+    };
+
+    function loadDepartments() {
+      const school = document.getElementById("school").value;
+      const departmentSelect = document.getElementById("department");
+
+      departmentSelect.innerHTML = "<option value=''>-- Select Department --</option>";
+      document.getElementById("attendanceSection").style.display = "none";
+
+      if (school && schools[school]) {
+        schools[school].forEach(dep => {
+          const option = document.createElement("option");
+          option.value = dep;
+          option.textContent = dep;
+          departmentSelect.appendChild(option);
+        });
+      }
+    }
+
+    function showAttendance() {
+      const department = document.getElementById("department").value;
+      const section = document.getElementById("attendanceSection");
+      const title = document.getElementById("attendanceTitle");
+      const studentList = document.getElementById("studentList");
+
+      if (!department) {
+        section.style.display = "none";
+        return;
+      }
+
+      title.textContent = `Attendance Sheet - ${department}`;
+      studentList.innerHTML = "";
+
+      (students[department] || []).forEach((student, index) => {
+        const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${student}</td>
+            <td><input type="radio" name="s${index}" value="Present"></td>
+            <td><input type="radio" name="s${index}" value="Absent"></td>
+          </tr>
+        `;
+        studentList.innerHTML += row;
+      });
+
+      section.style.display = "block";
+    }
+
+    function submitAttendance() {
+      const department = document.getElementById("department").value;
+      const studentList = students[department] || [];
+      let results = [];
+
+      studentList.forEach((name, index) => {
+        const selected = document.querySelector(`input[name="s${index}"]:checked`);
+        results.push({
+          roll: index + 1,
+          name: name,
+          status: selected ? selected.value : "Not Marked"
+        });
+      });
+
+      // Save to localStorage
+      localStorage.setItem("attendance_" + department, JSON.stringify(results));
+
+      // Show summary
+      let summary = `Attendance Submitted for ${department}\n\n`;
+      results.forEach(r => {
+        summary += `${r.roll}. ${r.name} → ${r.status}\n`;
+      });
+
+      alert(summary);
+    }
+  </script>
+</body>
+</html>

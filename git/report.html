@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance Report - Shreyarth University</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      padding: 30px;
+      background: #f4f6f9;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header img {
+      height: 70px;
+    }
+
+    h2 {
+      margin: 10px 0;
+      color: #1a237e;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background: #1a237e;
+      color: white;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+
+    .btn {
+      margin-top: 20px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #1a237e;
+      color: white;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #3949ab;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://i.ibb.co/Wy7FzNH/su-logo.png" alt="Shreyarth University Logo">
+    <h2>Shreyarth University, Ahmedabad</h2>
+    <h3 id="reportTitle">Attendance Report</h3>
+  </header>
+
+  <table>
+    <tr>
+      <th>Student Name</th>
+      <th>Status</th>
+    </tr>
+    <tbody id="reportTable"></tbody>
+  </table>
+
+  <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
+
+  <script>
+    const report = JSON.parse(localStorage.getItem("attendanceReport"));
+
+    if (report) {
+      document.getElementById("reportTitle").textContent =
+        `Attendance Report - ${report.department}`;
+
+      const reportTable = document.getElementById("reportTable");
+      report.data.forEach(entry => {
+        const row = `
+          <tr>
+            <td>${entry.name}</td>
+            <td>${entry.status}</td>
+          </tr>
+        `;
+        reportTable.innerHTML += row;
+      });
+    }
+  </script>
+</body>
+</html>
